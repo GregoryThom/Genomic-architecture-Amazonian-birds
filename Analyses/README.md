@@ -1,5 +1,7 @@
 Scripts used by Thom et al. 2023 GBE.
 
+Bioinfo_data_processing_raw_data_to_VCF: Commands used to process raw data to VCF files
+
 PipeMaster_Simulations: scripts used to simulate data under the coalescent and test alternative demographic models and estimate parameters with a neural network approach
 
 diploS/HIC: Pipeline used to test for selective sweeps and hitchhiking using diploS/HIC 
