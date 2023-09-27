@@ -1,4 +1,5 @@
 ###Running models pipemaster 
+## I recommend checking the original repository for PipeMaster for more details on how to set up the models: https://github.com/gehara/PipeMaster
 library(PipeMaster)
 library(ggplot2)
 library(caret)
@@ -14,7 +15,7 @@ setwd(direc)
 #read pop assignemt
 pop.assign <- read.delim(paste(species, "/pop_list.txt", sep = ""), header = FALSE)
 
-#draw models using PipeMaster (priors available in Table S20)
+#draw models using PipeMaster: https://github.com/gehara/PipeMaster (priors available in Table S20)
 if (exists("m1")==F) {
   #Topology 1
   m1 <- main.menu(m1)
