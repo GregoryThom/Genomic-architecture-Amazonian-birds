@@ -1,4 +1,5 @@
 ###Running models pipemaster 
+## I recommend checking the original repository for PipeMaster for more details on how to set up the models: https://github.com/gehara/PipeMaster
 library(PipeMaster)
 library(ggplot2)
 library(caret)
@@ -26,13 +27,11 @@ source("New_functions/run.carret.R")
 #Read population assigment file
   pop.assign <- read.delim("pop_list.txt", header = FALSE)
 
-###Desenhando os modelos
 
 #Size of the windows
 loci_size <- 100000
 
-
-#Adding intralocus recombination rate parameter
+#if models are not loaded, you will have to draw the models accordingly to Pipemaster's manual: https://github.com/gehara/PipeMaster
 if (exists("m1")==F) {
   m1 <- main.menu(m1)
   m2 <- main.menu(m2)
