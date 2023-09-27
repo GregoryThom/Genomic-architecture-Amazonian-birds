@@ -1,0 +1,1 @@
+scp -r -P 22 gthomesilva@mendel.sdmz.amnh.org:~/mendel-nas1/discoal/sims/*.fvec sims/

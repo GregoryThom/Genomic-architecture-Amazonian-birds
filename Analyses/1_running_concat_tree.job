@@ -1,0 +1,28 @@
+#!/bin/bash
+#PBS -l select=1:ncpus=16
+#PBS -l walltime=5000:00:00
+#PBS -N IqTree_genome
+#PBS -j oe
+#PBS -m ae
+#PBS -M gthomesilva@amnh.org
+#PBS -k oe
+
+# change to the working directory
+cd $PBS_O_WORKDIR
+echo "pbsworkdir"
+echo $PBS_O_WORKDIR
+EXECDIR=`pwd`
+export PATH=./:$PATH
+echo $PATH
+export XDG_CACHE_HOME=/nas4/gthomesilva/:$XDG_CACHE_HOME
+
+module load iqtree-2.0-rc2
+
+#cp ../twist/outgroup/SNP-only_phased.vcf.gz ./
+
+#here it will randomly resolve the IUPAC heterozygotes (if you dont want remove --resolve-IUPAC)
+
+#phleg
+python ../../programs/vcf2phylip/vcf2phylip.py -i SNP-only_phased.vcf.gz -m 24 -o rgym-A11932 -f -n -b --resolve-IUPAC
+
+iqtree -s SNP-only_phased.min*.phy -m GTR+ASC -T 16 -o rgym-A11932
