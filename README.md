@@ -1,4 +1,4 @@
-# Genomic-architecture-controls-biogeographic-structuring-in-Amazonian-birds
+# Genomic architecture drives population structuring in Amazonian birds
 This repository contains:
 Supplementary datasets: Tables S1, S3-S9, and S21.
 
