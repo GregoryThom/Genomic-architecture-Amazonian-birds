@@ -20,16 +20,17 @@ Simulations/
     Simulations_10kb/
     Genetic simulations for the three alternative topologies. We simulated data under three alternative topologies, matching the unrooted trees tested in our phylogenetic approach: topology 1) (out,(Belem,(Xingu,Tapajos))); topology 2) (out,(Tapajos,(Xingu,Belem))); and topology 3) (out,(Xingu,(Tapajos,Belem))). We simulated 5,000 loci of 10kb, using uniform and wide priors for all parameters (Table S19), and performed one million simulations per model.
     
-	Simulations_100kb/
-    Genetic simulations for the two alternative topologies. We simulated data under two alternative topologies, matching the unrooted trees tested in our phylogenetic approach: topology 1) (out,(Belem,(Xingu,Tapajos))); topology 2) (out,(Tapajos,(Xingu,Belem))).We performed 100,000 simulations per model, and used the same uniform priors for all parameters as implemented above.
+Simulations_100kb/
+    Genetic simulations for the two alternative topologies. We simulated data under two alternative topologies, matching the unrooted trees tested in our phylogenetic approach: 
+    topology 1) (out,(Belem,(Xingu,Tapajos))); topology 2) (out,(Tapajos,(Xingu,Belem))).We performed 100,000 simulations per model, and used the same uniform priors for all parameters as implemented above.
     
-	P_nigromaculata/ 
+P_nigromaculata/ 
     Observed data (fasta files) for Phlegopsis nigromaculata for the 10kb and 100kb approaches. 
     
-	X_spixii/ 
+X_spixii/ 
     Observed data (fasta files) for Xiphorhynchus spixii  for the 10kb and 100kb approaches. 
 
-	L_vociferans/ 
+L_vociferans/ 
     Observed data (fasta files) for Lipaugus vociferans for the 10kb and 100kb approaches. 
     
 
