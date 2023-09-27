@@ -1,0 +1,197 @@
+#!/bin/bash
+#PBS -l select=2:ncpus=24:mem=96gb
+#PBS -l walltime=5000:00:00
+#PBS -N BWA_alignment
+#PBS -j oe
+#PBS -m ae
+#PBS -M gthomesilva@amnh.org
+#PBS -k oe
+
+# change to the working directory
+cd $PBS_O_WORKDIR
+echo "pbsworkdir"
+echo $PBS_O_WORKDIR
+EXECDIR=`pwd`
+export PATH=./:$PATH
+echo $PATH
+###cd /home/gthomesilva/nas4
+
+###Arguments:
+ref=reference/rhegma_ragout_complete.fasta
+
+date
+time
+
+module load bwa-0.7.15
+module load fastqc-0.11.5
+module load R-3.4.1
+#module load parallel-20171122
+#source activate stampy
+
+#ls raw_data/*.gz | perl -p -w -e 's/raw_data\///g;s/_R.*//g' | uniq > 1_samples_names.txt
+
+
+#cat 1_samples_names.txt | parallel -j 20 java -jar /home/gthomesilva/nas4/programs/Trimmomatic-0.36/trimmomatic-0.36.jar PE raw_data/{}_R1.fastq.gz raw_data/{}_R2.fastq.gz clean/{}_R1_paired.fq.gz clean/{}_R1_unpaired.fq.gz clean/{}_R2_paired.fq.gz clean/{}_R2_unpaired.fq.gz ILLUMINACLIP:/home/gthomesilva/nas4/programs/Trimmomatic-0.36/adapters/TruSeq3-PE-2.fa:2:30:10:8:true
+
+
+##This loop will run on all samples on the clean folder
+for i in raw_data/FINAL_SEQ/toepad/runs_combined/clean/pn*_R1_paired.fq.gz; do
+        read1=$i
+
+        ##if your folders is not called clean/ change the command bellow
+        name=`echo $read1 | perl -p -w -e 's/.*clean\///g' | cut -d '_' -f1`
+        read2ending="_R2_paired.fq.gz"
+
+        ##adapt names here to fit your directories
+        read2=raw_data/FINAL_SEQ/toepad/runs_combined/clean/$name$read2ending
+	header=`zcat $read1 | head -1`
+	IFS=':' read -a header <<< "$header"
+	INSTRUMENT=${header[0]}
+	RUN_ID=${header[1]}
+	FLOWCELL_BARCODE=${header[2]}
+	LANE=${header[3]}
+	ID=$FLOWCELL_BARCODE.$LANE
+	PU=$FLOWCELL_BARCODE.$LANE.$name
+	SM=$name
+	PL=ILLUMINA
+	LB=TrueSeq
+        echo $name $read1 $read2 $ID $PU $SM $PL $LB
+	echo
+	echo "#######################"
+	echo $name
+	echo "#######################"
+	echo
+	echo	
+	echo Running BWA alignment
+	echo
+	echo
+	#adapt the names here to fit your directories
+	if [ ! -d "phleg/" ]; then mkdir phleg; fi 
+    if [ ! -d "phleg/BAM_files_toepad/" ]; then mkdir phleg/BAM_files_toepad; fi 
+	time bwa mem \
+	-M \
+	-t 24 \
+	$ref \
+	raw_data/FINAL_SEQ/toepad/runs_combined/clean/$name\_R1_paired.fq.gz \
+	raw_data/FINAL_SEQ/toepad/runs_combined/clean/$name\_R2_paired.fq.gz \
+	> phleg/BAM_files_toepad/$name.sam
+
+	echo	
+	echo
+	echo Converting SAM to sorted BAM
+	echo
+	echo	
+	
+	mkdir tmp
+	time java -jar programs/picard/picard.jar SortSam \
+	INPUT=phleg/BAM_files_toepad/$name.sam \
+	OUTPUT=phleg/BAM_files_toepad/$name.bam \
+	SORT_ORDER=coordinate \
+	TMP_DIR=`pwd`/tmp
+	rm -r tmp/
+	rm phleg/BAM_files_toepad/$name.sam
+
+	echo
+	echo
+	echo Adding Read Group
+	echo
+	echo
+	
+	time java -jar programs/picard/picard.jar AddOrReplaceReadGroups \
+	I=phleg/BAM_files_toepad/$name.bam \
+	O=phleg/BAM_files_toepad/$name.groups_added.bam \
+	RGID=$ID \
+	RGLB=$LB \
+	RGPL=$PL \
+	RGPU=$PU \
+	RGSM=$SM
+	rm phleg/BAM_files_toepad/$name.bam
+
+
+
+    if [ ! -d "phleg/Stats/" ]; then mkdir phleg/Stats; fi
+	echo
+	echo
+	echo Deduplication
+	echo
+	echo
+	
+	time java -jar programs/picard/picard.jar MarkDuplicates \
+	TMP_DIR=tmp \
+	I=phleg/BAM_files_toepad/$name.groups_added.bam \
+	O=phleg/BAM_files_toepad/$name.dedup.bam \
+	METRICS_FILE=phleg/Stats/$name.dedup.metrics.txt \
+	REMOVE_DUPLICATES=false \
+	MAX_FILE_HANDLES_FOR_READ_ENDS_MAP=1024 \
+	TAGGING_POLICY=All
+	rm -r tmp/
+	rm phleg/BAM_files_toepad/$name.groups_added.bam
+
+        echo
+        echo
+        echo Collecting alignment metrics
+        echo
+        echo
+
+        time java -jar programs/picard/picard.jar CollectAlignmentSummaryMetrics \
+        INPUT=phleg/BAM_files_toepad/$name.dedup.bam \
+        OUTPUT=phleg/Stats/$name.alignment_metrics.txt \
+        R=$ref \
+        METRIC_ACCUMULATION_LEVEL=SAMPLE \
+        METRIC_ACCUMULATION_LEVEL=READ_GROUP \
+
+        echo
+        echo
+        echo Collect Insert Size Metrics
+        echo
+        echo
+
+        time java -jar programs/picard/picard.jar CollectInsertSizeMetrics \
+        INPUT=phleg/BAM_files_toepad/$name.dedup.bam \
+        OUTPUT=phleg/Stats/$name.insert_metrics.txt \
+        HISTOGRAM_FILE=phleg/Stats/$name.insert_size_histogram.pdf
+
+        echo
+        echo
+        echo Collect Coverage Metrics
+        echo
+        echo
+
+        time java -jar programs/picard/picard.jar CollectRawWgsMetrics \
+        I=phleg/BAM_files_toepad/$name.dedup.bam \
+        O=phleg/Stats/$name.raw_wgs_metrics.txt \
+        R=$ref \
+        INCLUDE_BQ_HISTOGRAM=true
+
+	echo
+	echo
+	echo Indexing BAM
+	echo
+	echo
+	
+	time java -jar programs/picard/picard.jar BuildBamIndex \
+	I=phleg/BAM_files_toepad/$name.dedup.bam
+
+	echo
+	echo
+	echo Validating BAM
+	echo
+	echo
+
+	echo
+	echo
+        echo Running QUALIMAP
+        echo
+        echo
+
+	#time qualimap bamqc -nt 8 -bam BAM_files_toepad/$name.dedup.bam -outdir Stats/$name.QUALIMAP --java-mem-size=8G 
+
+	echo
+	echo "#######################"
+	echo $name DONE!
+	echo "#######################"
+	echo
+	echo
+
+done
+

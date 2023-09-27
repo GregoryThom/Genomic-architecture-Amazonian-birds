@@ -1,0 +1,58 @@
+#!/bin/bash
+#PBS -l select=1:ncpus=16:mem=128G
+#PBS -l walltime=5000:00:00
+#PBS -N GATK_SNP_calling
+#PBS -j oe
+#PBS -m ae
+#PBS -M gthomesilva@amnh.org
+#PBS -k oe
+
+# change to the working directory
+cd $PBS_O_WORKDIR
+echo "pbsworkdir"
+echo $PBS_O_WORKDIR
+EXECDIR=`pwd`
+export PATH=./:$PATH
+echo $PATH
+
+#Arguments:
+ref=reference/rhegma_ragout_complete.fasta
+
+##This is how you run this step from the terminal
+#for b in phleg/BAM_files/*.bam; do qsub -v bam=$b STEP2-GATK_SNP_calling_phleg.job; done
+##Youmight have to adjust this command based on your individuals' names. 
+name=`echo $bam | perl -p -w -e 's/\w+\/\w+\///g' | cut -d '.' -f1`
+echo
+echo "#######################"
+echo $name
+echo "#######################"
+
+echo
+echo
+echo Calling SNPs with GATK Haplotype Caller
+echo
+echo
+#adapt names here to fit your directories
+if [ ! -d "phleg/vcf_files/" ]; then mkdir phleg/vcf_files; fi 
+
+mkdir $name\_tmp
+
+time java -Djava.io.tmpdir=$name\_tmp -jar programs/GenomeAnalysisTK-3.8-1-0-gf15c1c3ef/GenomeAnalysisTK.jar -T HaplotypeCaller \
+-R $ref \
+-I $bam \
+-o phleg/vcf_files/$name.raw.g.vcf \
+--emitRefConfidence GVCF \
+-minPruning 1 \
+-minDanglingBranchLength 1 \
+-hets 0.05 \
+-nct 10
+
+rm -r $name\_tmp
+	echo
+	echo "#######################"
+	echo $name DONE!
+	echo "#######################"
+	echo
+	echo
+
+#done

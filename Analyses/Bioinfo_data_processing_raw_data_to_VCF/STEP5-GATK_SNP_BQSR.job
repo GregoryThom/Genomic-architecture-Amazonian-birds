@@ -1,0 +1,65 @@
+#!/bin/bash
+#PBS -l select=1:ncpus=16
+#PBS -l walltime=5000:00:00
+#PBS -N GATK_SNP_BQSR
+#PBS -j oe
+#PBS -m ae
+#PBS -M lmoreira@amnh.org
+#PBS -k oe
+
+# change to the working directory
+cd $PBS_O_WORKDIR
+echo "pbsworkdir"
+echo $PBS_O_WORKDIR
+EXECDIR=`pwd`
+export PATH=./:$PATH
+echo $PATH
+
+#Arguments:
+## ref=reference sequence
+## bam=bam file
+ref=reference/rhegma_ragout_complete.fasta
+module load R-3.4.1
+
+##This is how you run this step from the terminal
+#for b in phleg/BAM_files/*.bam; do qsub -v bam=$b STEP5-GATK_SNP_BQSR.job; done
+
+name=`echo $bam | cut -d '/' -f2 | cut -d '.' -f1`
+
+echo
+echo "#######################"
+echo $name
+echo "#######################"
+
+echo
+echo
+echo BQSR
+echo
+echo
+
+time java -jar programs/GenomeAnalysisTK-3.8-1-0-gf15c1c3ef/GenomeAnalysisTK.jar -T BaseRecalibrator \
+-R $ref \
+-I $bam \
+-knownSites phleg/vcf_files/allsamples.hardfiltered.db.vcf \
+-o BAM_files/$name.recal_data.grp \
+-nct 16
+
+echo
+echo
+echo Producing recalibrated VCF file
+echo
+echo
+mkdir phleg_tmp/
+
+time java -Djava.io.tmpdir=phleg_tmp/ -jar programs/GenomeAnalysisTK-3.8-1-0-gf15c1c3ef/GenomeAnalysisTK.jar -T HaplotypeCaller \
+-R $ref \
+-I $bam \
+-o vcf_files/$name.recal.vcf \
+--emitRefConfidence GVCF \
+-minPruning 1 \
+-minDanglingBranchLength 1 \
+-hets 0.05 \
+-BQSR BAM_files/$name.recal_data.grp \
+-nct 16
+
+rm -r phleg_tmp/
