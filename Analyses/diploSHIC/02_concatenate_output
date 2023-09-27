@@ -1,0 +1,39 @@
+rm neutral.job.*
+rm soft_sweep.job.*
+rm hard_sweep.job.*
+
+cd output
+##first remove similations that crashed the program
+for i in $(seq 0 11); do grep killing *hard_[$i]* | perl -p -w -e 's/:.*//g' | parallel rm {}; done
+
+for i in $(seq 0 11); do grep killing *soft_[$i]* | perl -p -w -e 's/:.*//g' | parallel rm {}; done
+
+grep killing *neutral* | perl -p -w -e 's/:.*//g' | parallel rm {}
+
+
+ cat *_hard_0.msOut > ../lipau_hard_0.msOut
+ cat *_hard_1.msOut > ../lipau_hard_1.msOut
+ cat *_hard_10.msOut > ../lipau_hard_10.msOut
+ cat *_hard_2.msOut > ../lipau_hard_2.msOut
+ cat *_hard_3.msOut > ../lipau_hard_3.msOut
+ cat *_hard_4.msOut > ../lipau_hard_4.msOut
+ cat *_hard_5.msOut > ../lipau_hard_5.msOut
+ cat *_hard_6.msOut > ../lipau_hard_6.msOut
+ cat *_hard_7.msOut > ../lipau_hard_7.msOut
+ cat *_hard_8.msOut > ../lipau_hard_8.msOut
+ cat *_hard_9.msOut > ../lipau_hard_9.msOut
+ cat *_neutral.msOut > ../lipau_neutral.msOut
+ cat *_soft_0.msOut > ../lipau_soft_0.msOut
+ cat *_soft_1.msOut > ../lipau_soft_1.msOut
+ cat *_soft_10.msOut > ../lipau_soft_10.msOut
+ cat *_soft_2.msOut > ../lipau_soft_2.msOut
+ cat *_soft_3.msOut > ../lipau_soft_3.msOut
+ cat *_soft_4.msOut > ../lipau_soft_4.msOut
+ cat *_soft_5.msOut > ../lipau_soft_5.msOut
+ cat *_soft_6.msOut > ../lipau_soft_6.msOut
+ cat *_soft_7.msOut > ../lipau_soft_7.msOut
+ cat *_soft_8.msOut > ../lipau_soft_8.msOut
+ cat *_soft_9.msOut > ../lipau_soft_9.msOut
+
+mkdir ../sims
+mv ../*.msOut ../sims/ 

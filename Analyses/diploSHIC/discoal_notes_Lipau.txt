@@ -1,0 +1,86 @@
+Note: Comment from Andrew Kern on the discoal issues:
+discoal scales all parameters by 4N or 2N as appropriate. 
+Thus the user sets \rho, which is equivalent to 4Nr where r is the 
+rate per locus per generation. The same would be true for u -- that 
+would be the mutation rate per locus per generation
+-Based on these info, all params need to be scaled by the window size.
+
+Ne estimated with SMC++ 10kya = 546766
+r estimated with relernn = 1.7766023662775E-09
+
+rho=4Ner
+rho = 0.003884226
+
+rho up (max relernn value) = 0.004748116
+rho low (min relernn value) = 0.000775533
+
+recombination prior = c(0.000775533,0.004748116) * 220000 # rate per bp * locus size    
+                  -Pre  = 170.6173 1044.5855
+
+assuming stable pop size
+pop. size estimate at 10 kya = 546766                
+
+theta 
+note: mutation rate is per generation per locus, so mu = 2.42e-9 / 2 * 220000 = 0.0002662
+
+theta prior = 0.0002662 * 4 * c(546766 / 3 , 546766 * 3) # 1/2 to 2x Ne to account for variation across genome
+                     -Pt  = 194.0655 1746.5893
+
+size phleg = 20
+
+n simulations 10000
+window size = 220000
+subwindow size = 20000
+
+prior on F0 (Pf) = 0 0.2 # for soft sweep sims only
+prior on tau (Pu) = between present and 10000 generations ago
+      phleg   = c(0, 10000) / 4 / 546766
+                -Pu  = 0.00000000 0.00457234
+prior on alpha (Pa) (2Ns) = selection coefficients between 0.0005 and 0.025
+      phleg   = c(0.0005, 0.025) * 2 * 546766
+                -Pa  = 546.766 27338.300
+      
+11 windows x positions = 
+0.045454545454545456
+0.13636363636363635
+0.22727272727272727 
+0.3181818181818182
+0.4090909090909091
+0.5 
+0.5909090909090909
+0.6818181818181818
+0.7727272727272727 
+0.8636363636363636
+0.9545454545454546 
+
+population size changes in discoal format:
+(limited to last 400,000 years)
+-en 0.00458060397775146 0 1 \
+-en 0.00509748204695461 0 0.284425609902729 \
+-en 0.00702513350427176 0 0.397509297948387 \
+-en 0.00824715240756323 0 0.236072863815017 \
+-en 0.00917776597589398 0 0.568552835320985 \
+-en 0.0107742343569871 0 0.530301110446409 \
+-en 0.0140756615426221 0 0.247964919125626 \
+-en 0.0165241167173114 0 0.258332239633896 \
+-en 0.0183887078466942 0 1.65047084619863 \
+-en 0.0215874155413025 0 2.60889347113148 \
+-en 0.0240233523125821 0 1.3707757195221 \
+-en 0.0282022039498578 0 0.446095345830454 \
+-en 0.0313845573678084 0 0.328091209754194 \
+-en 0.0368438874078108 0 18.4648830775164 \
+-en 0.0663356090627318 0 36.5786958753546 \
+-en 0.0699782698092475 0 18.4476667404547 \
+-en 0.0914209222239994 0 0.31363285137711 \
+-en 0.0964410827305639 0 0.653815598683684 \
+-en 0.125992436617003 0 0.899661162304275 \
+-en 0.164598878768693 0 0.938963907779394 \
+-en 0.226843191864568 0 0.903846321741691 \
+-en 0.280925826679098 0 0.818834778862092 \
+-en 0.296352194145759 0 0.689241766422925 \
+-en 0.347902528820226 0 0.559488959312125 \
+-en 0.367006761120989 0 0.508502075326666 \
+-en 0.430847426846831 0 0.462949497660936 \
+-en 0.454506379130334 0 0.689970356137355 \
+
+

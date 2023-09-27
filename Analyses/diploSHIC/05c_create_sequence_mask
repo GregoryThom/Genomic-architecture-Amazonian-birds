@@ -1,0 +1,26 @@
+
+# in shell
+#this is for Phleg
+conda activate phyluce
+
+#tail -n46 rhegma_ragout_complete.fasta.fai | cut -f1 > selection_sequence_list_certhia.txt
+
+#Xipho
+grep Pseudo Xiphorhynchus_elegans_OUT-0059_pseudo_chrom_only.fasta.fai | cut -f1 > selection_sequence_list_certhia.txt
+
+
+xargs samtools faidx Xiphorhynchus_elegans_OUT-0059_pseudo_chrom_only.fasta < selection_sequence_list_certhia.txt > diplo_genome.fasta
+bedtools maskfasta -fi diplo_genome.fasta -bed total_mask_sorted.bed -fo diplo_mask.fasta
+
+gzip diplo_mask.fasta
+
+
+#lipau
+grep Pseudo Cephalopterus_ornatus_B10K001_pseudochromossome_only.fasta.fai  | cut -f1 > selection_sequence_list_certhia.txt
+
+
+
+xargs samtools faidx Cephalopterus_ornatus_B10K001_pseudochromossome_only.fasta < selection_sequence_list_certhia.txt > diplo_genome.fasta
+bedtools maskfasta -fi diplo_genome.fasta -bed total_mask_sorted.bed -fo diplo_mask.fasta
+
+gzip diplo_mask.fasta

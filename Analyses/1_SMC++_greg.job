@@ -1,0 +1,41 @@
+#!/bin/bash
+#PBS -l select=1:ncpus=16
+#PBS -l walltime=5000:00:00
+#PBS -N SMC++
+#PBS -j oe
+#PBS -m ae
+#PBS -M gthomesilva@amnh.org
+#PBS -k oe
+
+# change to the working directory
+cd $PBS_O_WORKDIR
+echo "pbsworkdir"
+echo $PBS_O_WORKDIR
+EXECDIR=`pwd`
+export PATH=./:$PATH
+echo $PATH
+export XDG_CACHE_HOME=/nas4/gthomesilva/:$XDG_CACHE_HOME
+
+source activate smcpp
+
+if [ ! -d $subpop ]; then mkdir $subpop; fi  
+inds_list=$(grep $subpop pop_list.txt | awk '{print $1}' | paste -s -d ',')
+cat chromosomes.txt | while read line
+do
+inds=$(grep $subpop pop_list.txt | awk '{print $1}' | paste -s -d ' ')
+
+	for ind in $inds;
+	do
+		smc++ vcf2smc SMC.vcf.gz -d $ind $ind $subpop/$line\_$ind.smc.gz $line \
+		$subpop:$inds_list --mask mask.bed.gz
+	done
+done
+
+smc++ cv \
+4.6E-8 \
+--cores 16 \
+$subpop/*.smc.gz \
+--polarization-error 0.5 \
+--timepoints 5000 300000 \
+-o $subpop/total
+
