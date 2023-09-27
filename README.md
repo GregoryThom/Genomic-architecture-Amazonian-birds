@@ -4,7 +4,7 @@ Supplementary datasets: Tables S1, S3-S9, and S21.
 
 Analyses: The scripts used to run phylogenetic and population genetic analyses
 
-Data: (link to Dryad)
+Data: (DOI: 10.5061/dryad.76hdr7t2s)
 
 Description of the data available in Dryad:
 
